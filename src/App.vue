@@ -41,14 +41,12 @@
               <div class="font-weight-bold ml-auto">Income(MMK)</div>
             </div>
             <template v-if="filterUser.length">
-              <div
-                class="d-flex justify-content-between mb-2"
+              <user-card
                 v-for="(user, index) in filterUser"
-                v-bind:key="index"
-              >
-                <div class="ml-3">{{ user.name }}</div>
-                <div class="ml-auto">{{ formatNumberMMK(user.income) }}</div>
-              </div>
+                :key="index"
+                :user="user"
+                :formatNumberMMK="formatNumberMMK"
+              />
               <div class="d-flex justify-content-between mb-2" v-if="total > 0">
                 <div class="font-weight-bold">Total</div>
                 <div class="font-weight-bold">{{ formatNumberMMK(total) }}</div>
@@ -62,9 +60,11 @@
 </template>
 
 <script>
+import userCard from "./components/userCard.vue";
 //defalut name UserRepo
 import UserRepo from "./userRepo";
 export default {
+  components: { userCard },
   name: "App",
   data: () => ({
     title: "従業員の給料アレイ",
