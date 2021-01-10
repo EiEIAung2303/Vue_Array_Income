@@ -17,6 +17,7 @@
                     type="text"
                     class="form-control"
                     name="Search"
+                    id="Search"
                     v-model="search"
                     aria-describedby="helpId"
                     placeholder="Name"
@@ -26,44 +27,11 @@
               <button
                 type="button"
                 class="btn btn-primary m-1"
-                v-on:click="btnLabel = 'doubleIncome'"
+                v-on:click="btnLabel = group.action"
+                v-for="(group, index) in btnGroup"
+                :key="index"
               >
-                Double Income
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary m-1"
-                v-on:click="btnLabel = 'showOnlyMillionaries'"
-              >
-                Show only Millionaires
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary m-1"
-                v-on:click="btnLabel = 'incomplete'"
-              >
-                Show only Incomplete
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary m-1"
-                v-on:click="btnLabel = 'riches'"
-              >
-                Sort by Richest
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary m-1"
-                v-on:click="btnLabel = 'sortfromlowincome'"
-              >
-                From Low Income to Up
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary m-1"
-                v-on:click="btnLabel = 'total'"
-              >
-                Calculate Total Income
+                {{ group.label }}
               </button>
             </div>
           </div>
@@ -105,6 +73,14 @@ export default {
     btnLabel: "",
     total: 0,
     search: "",
+    btnGroup: [
+      { label: "Double Income", action: "doubleIncome" },
+      { label: "Show only Millionaires", action: "showOnlyMillionaries" },
+      { label: "Show only Incomplete", action: "incomplete" },
+      { label: "Sort by Richest", action: "riches" },
+      { label: "Double From Low Income to Up", action: "sortfromlowincome" },
+      { label: "Calculate Total Income", action: "total" },
+    ],
   }),
   created() {
     this.users = this.users.map((user) => {
@@ -133,39 +109,46 @@ export default {
     filterUser() {
       let tmp = this.users;
       this.setTotal(0);
-      if (this.btnLabel == "doubleIncome") {
-        tmp = tmp.map((user) => {
-          //return as object
-          return {
-            name: user.name,
-            income: user.income * 2,
-          };
-        });
-        this.setUsers(tmp);
-        this.setBtnLabel("");
-      } else if (this.btnLabel == "showOnlyMillionaries") {
-        tmp = tmp.filter((user) => {
-          return user.income > 1000000;
-        });
-      } else if (this.btnLabel == "incomplete") {
-        tmp = tmp.filter((user) => {
-          return user.income < 1000000;
-        });
-      } else if (this.btnLabel == "riches") {
-        tmp = tmp.sort((a, b) => {
-          return b.income - a.income;
-        });
-      } else if (this.btnLabel == "sortfromlowincome") {
-        tmp = tmp.sort((a, b) => {
-          return a.income - b.income;
-        });
-      } else if (this.btnLabel == "total") {
-        let dataKyat = tmp.reduce(
-          (total, user) => (total += Number(user.income)),
-          0
-        );
-        this.setTotal(dataKyat);
-      } else if (this.search !== "") {
+      let data;
+      switch (this.btnLabel) {
+        case "doubleIncome":
+          tmp = tmp.map((user) => {
+            //return as object
+            return {
+              name: user.name,
+              income: user.income * 2,
+            };
+          });
+          this.setUsers(tmp);
+          this.setBtnLabel("");
+          break;
+        case "showOnlyMillionaries":
+          tmp = tmp.filter((user) => {
+            return user.income > 1000000;
+          });
+          break;
+        case "incomplete":
+          tmp = tmp.filter((user) => {
+            return user.income < 1000000;
+          });
+          break;
+        case "riches":
+          tmp = tmp.sort((a, b) => {
+            return b.income - a.income;
+          });
+          break;
+        case "sortfromlowincome":
+          tmp = tmp.sort((a, b) => {
+            return a.income - b.income;
+          });
+          break;
+        case "total":
+          data = tmp.reduce((total, user) => (total += Number(user.income)), 0);
+          this.setTotal(data);
+          break;
+      }
+
+      if (this.search !== "") {
         let search = this.search.toLowerCase();
         if (search) {
           tmp = tmp.filter((v) => v.name.toLowerCase().indexOf(search) > -1);
