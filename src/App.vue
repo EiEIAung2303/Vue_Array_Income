@@ -17,36 +17,52 @@
                     type="text"
                     class="form-control"
                     name="Search"
-                    id="search"
+                    v-model="search"
                     aria-describedby="helpId"
                     placeholder="Name"
                   />
                 </div>
               </div>
-              <button type="button" class="btn btn-primary m-1" v-on:click="doubleIncome">
+              <button
+                type="button"
+                class="btn btn-primary m-1"
+                v-on:click="btnLabel = 'doubleIncome'"
+              >
                 Double Income
               </button>
               <button
                 type="button"
                 class="btn btn-primary m-1"
-                v-on:click="showOnlyMillionaries"
+                v-on:click="btnLabel = 'showOnlyMillionaries'"
               >
                 Show only Millionaires
               </button>
-              <button type="button" class="btn btn-primary m-1" v-on:click="incomplete">
+              <button
+                type="button"
+                class="btn btn-primary m-1"
+                v-on:click="btnLabel = 'incomplete'"
+              >
                 Show only Incomplete
               </button>
-              <button type="button" class="btn btn-primary m-1" v-on:click="riches">
+              <button
+                type="button"
+                class="btn btn-primary m-1"
+                v-on:click="btnLabel = 'riches'"
+              >
                 Sort by Richest
               </button>
               <button
                 type="button"
                 class="btn btn-primary m-1"
-                v-on:click="sortfromlowincome"
+                v-on:click="btnLabel = 'sortfromlowincome'"
               >
                 From Low Income to Up
               </button>
-              <button type="button" class="btn btn-primary m-1" id="total">
+              <button
+                type="button"
+                class="btn btn-primary m-1"
+                v-on:click="btnLabel = 'total'"
+              >
                 Calculate Total Income
               </button>
             </div>
@@ -55,20 +71,21 @@
             <div class="d-flex justify-content-between mb-2">
               <div class="font-weight-bold ml-3">Users</div>
               <div class="font-weight-bold ml-auto">Income(MMK)</div>
-              <div class="font-weight-bold ml-auto">Edit/Delete</div>
             </div>
             <template v-if="filterUser.length">
               <div
-              class="d-flex justify-content-between mb-2"
-              v-for="(user, index) in filterUser"
-              v-bind:key="index"
-            >
-              <div class="ml-3">{{ user.name }}</div>
-              <div class="ml-auto">{{formatNumberMMK(user.income)}}</div>
-              <div class="ml-auto">Edit/Delete</div>
-            </div>
+                class="d-flex justify-content-between mb-2"
+                v-for="(user, index) in filterUser"
+                v-bind:key="index"
+              >
+                <div class="ml-3">{{ user.name }}</div>
+                <div class="ml-auto">{{ formatNumberMMK(user.income) }}</div>
+              </div>
+              <div class="d-flex justify-content-between mb-2" v-if="total > 0">
+                <div class="font-weight-bold">Total</div>
+                <div class="font-weight-bold">{{ formatNumberMMK(total) }}</div>
+              </div>
             </template>
-            
           </div>
         </div>
       </div>
@@ -77,116 +94,91 @@
 </template>
 
 <script>
+//defalut name UserRepo
+import UserRepo from "./userRepo";
 export default {
   name: "App",
   data: () => ({
     title: "従業員の給料アレイ",
     explain: "(Employees' Array Income)",
-    users: [
-      {
-        name: "Kyaw Kyaw",
-      },
-      {
-        name: "Su Su Aye Aung",
-      },
-      {
-        name: "Zaw Myo Tun",
-      },
-      {
-        name: "Thuzar Phyo",
-      },
-      {
-        name: "Kalayar Htun",
-      },
-      {
-        name: "Chan Chan",
-      },
-      {
-        name: "Aung Aung Oo",
-      },
-      {
-        name: "Hsu Mon Aung",
-      },
-      {
-        name: "Kyaw Ye Lwin",
-      },
-      {
-        name: "Wai Phyoe Aung",
-      },
-    ],
+    users: UserRepo,
+    btnLabel: "",
+    total: 0,
+    search: "",
   }),
-  computed:{
-    filterUser(){
-      return this.users.length !== 0 ? this.users.filter(()=> this.users) : this.data;
-    }
+  created() {
+    this.users = this.users.map((user) => {
+      return {
+        name: user.name,
+        income: Math.floor(Math.random() * 1000000),
+      };
+    });
   },
   methods: {
     formatNumberMMK(num) {
       return Number(num).toLocaleString("mmk");
     },
-    storeData() {
-      localStorage.setItem("users", JSON.stringify(this.users));
+    setBtnLabel(val) {
+      this.btnLabel = val;
     },
-    doubleIncome() {
-      //alert('eea')
-      this.users = this.users.map((user) => {
-        //return as object
-        return {
-            name: user.name,
-            income: user.income * 2
-        }
-    });
-    this.storeData();
+    setUsers(val) {
+      this.users = val;
     },
-    showOnlyMillionaries() {
-     // alert('eea')
-      this.users = this.users.filter((user) => {
-        
-          return (user.income > 1000000)
-    
-    });
-    this.users;
-      
+    setTotal(val) {
+      this.total = val;
     },
-    incomplete() {
-      this.users = this.users.filter((user) => {
-        
-          return (user.income < 1000000)
-        
-    });
-    this.users;
-    },
-    riches() {
-      this.users = this.users.sort((a, b) => {
-        return b.income - a.income
-    });
-    this.storeData();
-    },
-    sortfromlowincome() {
-      this.users = this.users.sort((a, b) => {
-        return a.income - b.income;
-    });
-    this.storeData();
-    }
   },
-  created() {  
-      this.users = this.users.map((user) => {
-    return {
-              name: user.name,
-              income: Math.floor(Math.random() * 1000000),
-             } 
-    });
-   this.storeData();
-},
-mounted() {
-    let data = localStorage.getItem("users");
-      if (data !== null) {
-        this.users = JSON.parse(data);
-      }  
-},
-}
+  computed: {
+    //method with return
+    filterUser() {
+      let tmp = this.users;
+      this.setTotal(0);
+      if (this.btnLabel == "doubleIncome") {
+        tmp = tmp.map((user) => {
+          //return as object
+          return {
+            name: user.name,
+            income: user.income * 2,
+          };
+        });
+        this.setUsers(tmp);
+        this.setBtnLabel("");
+      } else if (this.btnLabel == "showOnlyMillionaries") {
+        tmp = tmp.filter((user) => {
+          return user.income > 1000000;
+        });
+      } else if (this.btnLabel == "incomplete") {
+        tmp = tmp.filter((user) => {
+          return user.income < 1000000;
+        });
+      } else if (this.btnLabel == "riches") {
+        tmp = tmp.sort((a, b) => {
+          return b.income - a.income;
+        });
+      } else if (this.btnLabel == "sortfromlowincome") {
+        tmp = tmp.sort((a, b) => {
+          return a.income - b.income;
+        });
+      } else if (this.btnLabel == "total") {
+        let dataKyat = tmp.reduce(
+          (total, user) => (total += Number(user.income)),
+          0
+        );
+        this.setTotal(dataKyat);
+      } else if (this.search !== "") {
+        let search = this.search.toLowerCase();
+        if (search) {
+          tmp = tmp.filter((v) => v.name.toLowerCase().indexOf(search) > -1);
+        }
+      }
+      return tmp;
+    },
+  },
+};
 </script>
 
 <style>
+body {
+  background-color: #948957 !important;
+}
 </style>
-
