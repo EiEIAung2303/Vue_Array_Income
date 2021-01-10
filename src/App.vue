@@ -42,9 +42,9 @@
             </div>
             <template v-if="filterUser.length">
               <user-card
-                v-for="(user, index) in filterUser"
+                v-for="(user,index) in filterUser"
                 :key="index"
-                :user="user"
+                :user="user" 
                 :formatNumberMMK="formatNumberMMK"
               />
               <div class="d-flex justify-content-between mb-2" v-if="total > 0">
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import userCard from "./components/userCard.vue";
+import userCard from './components/userCard.vue';
 //defalut name UserRepo
 import UserRepo from "./userRepo";
 export default {
